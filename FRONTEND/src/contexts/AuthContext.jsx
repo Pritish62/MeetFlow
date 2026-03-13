@@ -1,0 +1,70 @@
+import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+
+export const AuthContext = createContext({});
+
+const client = axios.create({
+    baseURL: "http://localhost:8000/users"
+});
+
+export const AuthProvider = ({ children }) => {
+    const [userData, setUserData] = useState(null);
+    const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+    useEffect(() => {
+        if (token) {
+            localStorage.setItem("token", token);
+        } else {
+            localStorage.removeItem("token");
+        }
+    }, [token]);
+
+    const handleRegister = async (username, email, password) => {
+        try {
+            const request = await client.post("/register", {
+                username,
+                email,
+                password
+            });
+            return request.data;
+        } catch (err) {
+            throw err;
+        }
+    };
+
+    const handleLogin = async (email, password) => {
+        try {
+            const request = await client.post("/login", {
+                email,
+                password
+            });
+            if (request.status === 200 && request.data.token) {
+                setToken(request.data.token);
+                return request.data;
+            }
+            throw new Error(request.data.message || "Failed to login");
+        } catch (err) {
+            throw err;
+        }
+    };
+
+    const logout = () => {
+        setToken(null);
+        setUserData(null);
+    };
+
+    const data = {
+        userData,
+        setUserData,
+        token,
+        handleRegister,
+        handleLogin,
+        logout
+    };
+
+    return (
+        <AuthContext.Provider value={data}>
+            {children}
+        </AuthContext.Provider>
+    );
+};

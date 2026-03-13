@@ -1,0 +1,67 @@
+.Navcontainer nav{
+    display: flex;
+    justify-content: space-between;
+}.Navcontainer {
+  width: 100%;
+  
+  background-color: #0f172a; /* dark blue */
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.navLinks {
+  display: flex;
+gap: 10px
+}
+
+/* Normal Button */
+.btn {
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: white;
+  background: transparent;
+  border: 1px solid white;
+  transition: 0.3s ease;
+}
+
+/* Hover Effect */
+.btn:hover {
+  background: white;
+  color: #0f172a;
+}
+
+/* Primary Button (Register) */
+.btnPrimary {
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  background: #2563eb; /* blue */
+  border: none;
+  transition: 0.3s ease;
+}
+
+.btnPrimary:hover {
+  background: #1d4ed8;
+}
+
+/* Active Link Style */
+.btnActive {
+  background: white;
+  color: #0f172a;
+}
