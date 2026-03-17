@@ -1,16 +1,26 @@
 import { NavLink } from "react-router-dom";
 import styles from "./Navbar.module.css";
+import logo from '../assets/images/logo.png';
 
 const Navbar = () => {
   return (
     <div className={styles.Navcontainer}>
       <nav className={styles.navbar}>
-        <h2 className={styles.logo}>VideoApp</h2>
+        <div className={styles.logo}>
+          <span className={styles.logoIcon}><img src={logo} alt="MeetFlow logo" /></span>
+          <h2>MeetFlow</h2>
+        </div>
 
         <div className={styles.navLinks}>
-          <NavLink to="/Home" className={styles.btn}>Home</NavLink>
+          <a href="#why" className={styles.btn}>Why MeetFlow?</a>
+          <a href="#features" className={styles.btn}>Features</a>
+          <a href="#platforms" className={styles.btn}>Platforms</a>
+          <a href="#pricing" className={styles.btn}>Pricing</a>
+        </div>
+
+        <div className={styles.authLinks}>
           <NavLink to="/Login" className={styles.btn}>Login</NavLink>
-          <NavLink to="/Register" className={styles.btnPrimary}>Register</NavLink>
+          <NavLink to="/Register" className={styles.btnPrimary}>Sign Up</NavLink>
         </div>
       </nav>
     </div>

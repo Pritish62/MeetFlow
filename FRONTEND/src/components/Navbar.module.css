@@ -1,67 +1,86 @@
-.Navcontainer nav{
-    display: flex;
-    justify-content: space-between;
-}.Navcontainer {
+:root{
+  --bg: #ffffff;
+  --text: #0f172a;
+  --muted: #6b7280;
+  --accent: #2563eb;
+}
+
+.Navcontainer {
   width: 100%;
-  
-  background-color: #0f172a; /* dark blue */
+  background: var(--bg);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .navbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px 6vw;
+  gap: 20px;
 }
 
 .logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
 }
+
+.logo h2 {
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.logoIcon { font-size: 22px; display: flex; align-items: center; }
 
 .navLinks {
   display: flex;
-gap: 10px
+  gap: 22px;
+  align-items: center;
 }
 
-/* Normal Button */
+.authLinks { display:flex; gap:12px; align-items:center; }
+
 .btn {
   text-decoration: none;
-  padding: 10px 18px;
+  padding: 8px 12px;
   border-radius: 8px;
-  font-size: 16px;
-  font-weight: 500;
-  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
   background: transparent;
-  border: 1px solid white;
-  transition: 0.3s ease;
+  border: 1px solid transparent;
+  transition: color 0.15s ease;
 }
 
-/* Hover Effect */
-.btn:hover {
-  background: white;
-  color: #0f172a;
-}
+.btn:hover { color: var(--accent); }
 
-/* Primary Button (Register) */
 .btnPrimary {
   text-decoration: none;
-  padding: 10px 18px;
+  padding: 8px 14px;
   border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   color: white;
-  background: #2563eb; /* blue */
+  background: var(--accent);
   border: none;
-  transition: 0.3s ease;
+}
+.logoIcon img {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
 }
 
-.btnPrimary:hover {
-  background: #1d4ed8;
+.btnPrimary:hover { opacity: 0.95; transform: translateY(-1px); }
+
+@media (max-width: 768px){
+  .navLinks { display: none; }
 }
 
-/* Active Link Style */
-.btnActive {
-  background: white;
-  color: #0f172a;
-}
