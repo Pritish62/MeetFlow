@@ -9,7 +9,7 @@ export const connectSocket = (server) => {
             origin: "*",
             methods: ["GET", "POST"],
             allowedHeaders: ["*"],
-            credentials: true;
+            credentials: true
         }
     });
     io.on("connection", (socket) => {

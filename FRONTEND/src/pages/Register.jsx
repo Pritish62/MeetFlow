@@ -9,6 +9,8 @@ import {
   CssBaseline,
   Avatar,
   Grid,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { AuthContext } from '../contexts/AuthContext.jsx';
@@ -23,6 +25,7 @@ const Register = () => {
 
   // Optional: State to handle password mismatch errors
   const [error, setError] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const { handleRegister } = React.useContext(AuthContext);
   const navigate = useNavigate();
@@ -41,7 +44,10 @@ const Register = () => {
 
     try {
       await handleRegister(username, email, password);
-      navigate("/login");
+      setSnackbarOpen(true);
+      setTimeout(() => {
+        navigate('/login', { state: { email, password, username } });
+      }, 1200);
     } catch (err) {
       setError(err.response?.data?.message || err.message || "Failed to register");
     }
@@ -147,6 +153,16 @@ const Register = () => {
 
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+          User registered
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

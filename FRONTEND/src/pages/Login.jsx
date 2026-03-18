@@ -12,15 +12,24 @@ import {
 } from '@mui/material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { AuthContext } from '../contexts/AuthContext.jsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const location = useLocation();
 
   const { handleLogin } = React.useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (location?.state) {
+      if (location.state.email) setEmail(location.state.email);
+      if (location.state.password) setPassword(location.state.password);
+    }
+  }, [location]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
