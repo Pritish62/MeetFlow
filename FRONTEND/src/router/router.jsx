@@ -4,6 +4,7 @@ import Home from "../pages/Home.jsx";
 import Login from "../pages/Login.jsx";
 import Register from "../pages/Register.jsx";
 import Landingpage from "../pages/Landingpage.jsx";
+import VideoMeetComponent from "../pages/VideoMeet.jsx";
 
 
 const router = createBrowserRouter([
@@ -27,7 +28,10 @@ const router = createBrowserRouter([
                 path: "login",
                 element: <Login />
             },
-            
+            {
+                path: "/:url",
+                element: <VideoMeetComponent/>
+            }
         ]
     }
 
