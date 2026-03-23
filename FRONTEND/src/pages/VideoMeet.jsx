@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import { io } from "socket.io-client";
 import {
     TextField,
     Button,
@@ -11,7 +12,7 @@ import {
     Grid,
 } from '@mui/material';
 
-const url = "http://localhost:8000"
+const url = "http://localhost:8000";
 
 var connections = {};
 
@@ -76,15 +77,62 @@ export default function VideoMeetComponent() {
             if (audioPermission) {
                 setAudioAvailable(true);
             } else {
-                setAudioAvailable(false)
+                setAudioAvailable(false);
             }
-        } catch {
-
+            if (videoAvailable || audioAvailable) {
+                const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: videoAvailable, audio: audioAvailable });
+                if (userMediaStream) {
+                    window.localstream = userMediaStream;
+                    if (localVideoRef.current) {
+                        localVideoRef.current.srcObject = userMediaStream;
+                    }
+                }
+            }
+        } catch (err) {
+            console.log(err);
         }
     }
     useEffect(() => {
         getPermission();
     }, []);
+    const getUserMedia = () => {
+        if ((video && videoAvailable) || (audio && audioAvailable)) {
+            navigator.mediaDevices.getUserMedia({ video: video, audio: audio })
+                .then(() => { }) //todo getUserMediasuccess
+                .then((stream) => { })
+
+                .catch((e) => console.log(e));
+        } else {
+            try {
+                let tracks = localVideoRef.current.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+            } catch (error) {
+                console.log(error);
+            }
+        }
+    }
+    useEffect(() => {
+        if (video == !undefined && audio == !undefined) {
+            getUserMedia();
+        }
+    }, [audio, video]);
+
+    const connectToSocketServer = () => {
+        socketRef.current = io(url, { secure: false });
+    };
+
+
+    let getMedia = () => {
+        setVideo(videoAvailable);
+        setAudio(audioAvailable);
+        connectToSocketServer();
+    };
+
+    const connect = () => {
+        if (!username.trim()) return;
+        getMedia();
+        setaAskForUsername(false);
+    };
 
     return (
         <div>
@@ -93,7 +141,7 @@ export default function VideoMeetComponent() {
                     <div>
                         <h3> Enter to Lobby</h3>
                         <TextField id="outlined-basic" label="username" variant="outlined" value={username} onChange={e => setUsername(e.target.value)} />
-                        <Button variant="contained">connect</Button>
+                        <Button variant="contained" onClick={connect}>connect</Button>
                         <div>
                             <video ref={localVideoRef} autoPlay muted></video>
                         </div>
