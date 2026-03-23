@@ -6,7 +6,7 @@ import img1 from "../assets/images/img1.jpg"
 const Landingpage = () => {
   return (
     <div className={styles.landingContainer}>
-      
+
       {/* Hero Section */}
       <section className={styles.heroSection}>
         <div className={styles.heroBadge}>
@@ -21,25 +21,18 @@ const Landingpage = () => {
           </h1>
 
           <p className={styles.subHeading}>
-            Welcome to our revolutionary video conferencing platform, where communication knows no boundaries. 
+            Welcome to our revolutionary video conferencing platform, where communication knows no boundaries.
             Crystal clear audio, intuitive interface, and enterprise-grade security.
           </p>
 
-          <div className={styles.ctaButtons}>
-            <button className={styles.btnPrimaryLarge}>
-              🚀 Try 14 Days Free Trial
-            </button>
-            <button className={styles.btnSecondaryLarge}>
-              ▶ Play Video Demo
-            </button>
-          </div>
+
         </div>
 
         {/* Conference Preview Grid */}
         <div className={styles.conferenceGrid}>
           <div className={styles.mainVideo}>
             <div className={styles.videoPlaceholder}>
-              
+
               <div className={styles.userCard}> <img src={img1} alt="" />Jack Williams</div>
             </div>
           </div>
@@ -80,7 +73,7 @@ const Landingpage = () => {
       {/* Features Section */}
       <section id="features" className={styles.featuresSection}>
         <h2 className={styles.sectionTitle}>Why Choose MeetFlow?</h2>
-        
+
         <div className={styles.featuresGrid}>
           <div className={styles.featureCard}>
             <div className={styles.featureIcon}>🎵</div>
@@ -112,7 +105,7 @@ const Landingpage = () => {
       <section className={styles.ctaSection}>
         <h2>Ready to Transform Your Meetings?</h2>
         <p>Join thousands of teams already using MeetFlow for seamless collaboration</p>
-        
+
         <div className={styles.ctaButtons}>
           <NavLink to="/Register" className={styles.btnPrimaryLarge}>
             Get Started Free
@@ -159,7 +152,7 @@ const Landingpage = () => {
         </div>
 
         <div className={styles.footerBottom}>
-          <p>&copy; 2024 MeetFlow. All rights reserved.</p>
+          <p>&copy; 2026 MeetFlow. All rights reserved.</p>
         </div>
       </footer>
     </div>

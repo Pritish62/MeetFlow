@@ -15,12 +15,14 @@ const Navbar = () => {
           <a href="#why" className={styles.btn}>Why MeetFlow?</a>
           <a href="#features" className={styles.btn}>Features</a>
           <a href="#platforms" className={styles.btn}>Platforms</a>
-          <a href="#pricing" className={styles.btn}>Pricing</a>
+      
         </div>
 
         <div className={styles.authLinks}>
+          <NavLink to="/guest" className={`${styles.btnPrimary} ${styles.joinBtn}`}>Join as geust</NavLink>
           <NavLink to="/Login" className={styles.btn}>Login</NavLink>
           <NavLink to="/Register" className={styles.btnPrimary}>Sign Up</NavLink>
+
         </div>
       </nav>
     </div>
