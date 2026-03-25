@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import {
     TextField,
     Button,
@@ -17,7 +17,7 @@ const url = "http://localhost:8000";
 var connections = {};
 
 const peerConnections = {
-    "iceServer": [
+    "iceServers": [
         { "urls": "stun:stun.l.google.com:19302" }
     ]
 }
@@ -33,7 +33,7 @@ export default function VideoMeetComponent() {
 
     let [audioAvailable, setAudioAvailable] = useState(true);
 
-    let [video, setVideo] = useState();
+    let [video, setVideo] = useState([]);
 
     let [audio, setAudio] = useState();
 
@@ -49,7 +49,7 @@ export default function VideoMeetComponent() {
 
     let [newMessages, serNewMessages] = useState(0);
 
-    let [askForUsername, setaAskForUsername] = useState(true);
+    let [askForUsername, setAskForUsername] = useState(true);
 
     let [username, setUsername] = useState("");
 
@@ -117,8 +117,35 @@ export default function VideoMeetComponent() {
         }
     }, [audio, video]);
 
+    //TODO addMessage
+    const addMessage = ( ) => {
+
+    }   
+    const getMessageFronServer = () => {
+
+    } 
+
     const connectToSocketServer = () => {
         socketRef.current = io(url, { secure: false });
+        socketRef.current.on('signal', getMessageFronServer);
+        socketRef.current.on("connect", () => {
+            socketRef.current.emit("join-call", window.location.href);
+            socketIdRef.current = socketRef.current.id;
+            socketRef.current.on("chat-message", addMessage);
+            socketRef.current.on("user-left", (id) => {
+                setVideo((videos) => videos.filter((video)=> video.socketId !== id))
+            })
+            socketRef.current.on("user-joind", (id, clients) => {
+                clients.forEach((socketListId) => {
+
+                    connections[socketListId] = new RTCPeerConnection(peerConnections);
+
+                    connections[socketListId].onicecandidate = (event) => {
+                        socketRef.current.emit("signal", socketListId, JSON.stringify({'ice' : event.candidate}));
+                    }
+                })
+            })
+        })
     };
 
 
@@ -131,7 +158,7 @@ export default function VideoMeetComponent() {
     const connect = () => {
         if (!username.trim()) return;
         getMedia();
-        setaAskForUsername(false);
+        setAskForUsername(false);
     };
 
     return (
