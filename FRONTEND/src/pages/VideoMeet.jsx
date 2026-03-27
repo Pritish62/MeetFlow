@@ -95,6 +95,61 @@ export default function VideoMeetComponent() {
     useEffect(() => {
         getPermission();
     }, []);
+
+
+    const getUserMediasuccess = (stream) => {
+        
+        try {
+        window.localStream.getTracks().forEach(track => track.stop());
+            
+        } catch (er) {
+            console.log(er);
+        }
+
+        for(let id in connections){
+            if(id === socketIdRef.current) continue;
+            connections[id].addStream(window.localStream);
+            connections[id].createOffer((description) => {
+                connections[id].setLocalDescription(description)
+                .then(() => {
+                    socketIdRef.current.emit("signal", id, JSON.stringify({"sdp": connections[id].localDescription}))
+                }).catch(err  => console.log(err)) 
+            })
+        }
+
+        stream.getTracks.forEach(track => track.onended = () => {
+            setVideo(false);
+            setAudio(false);
+
+            try {
+                const tracks = localVideoRef.current.srcObject.getTracks();
+                tracks.forEach(tracks => tracks.stop())
+            } catch (err) {
+                console.log(err)
+            }
+        });
+    }
+
+
+    const silence = () => {
+        const ctx = new AudioContext();
+        const oscilator = ctx.createOscillator();
+
+        oscilator.start();
+        ctx.resume();
+        return object.assign(dst.stream.getAudioTracks()[0],{enabled: false})
+    }
+
+    const black = ({width = 640, height = 400 } = {}) => {
+        const canvas = Object.assign(document.createElement("canvas"), {width, height});
+
+        canvas.getContext('2d').fillRect(0, 0, width, height);
+
+        const stream = canvas.captureStream();
+        return Object.assign(stream.getVideoTracks()[0], {enabled: false})
+    }
+
+
     const getUserMedia = () => {
         if ((video && videoAvailable) || (audio && audioAvailable)) {
             navigator.mediaDevices.getUserMedia({ video: video, audio: audio })
@@ -121,13 +176,33 @@ export default function VideoMeetComponent() {
     const addMessage = ( ) => {
 
     }   
-    const getMessageFronServer = () => {
+    const gotMessageFronServer = (fromId, message) => {
+        var signal = JSON.parse(message);
 
+        if(fromId !== socketIdRef.current){
+            if(signal.sdp){
+                connections[fromId].setRemoteDescription(new RTCSessionDescription(signal.sdp)).then(()=>{
+                    if(signal.sdp.type === "offer"){
+                        connections[fromId].createAnswer().then((description) => {
+                            connections[fromId].setLocalDescription(description)
+                            .then(() => {
+                                socketRef.current.emit("signal", fromId, JSON.stringify({"sdp": connections[fromId].localDescription}))
+                            })
+                            .catch(e => console.log(e))
+                        }).catch(e => console.log(e))
+                    }
+                }).catch(e => console.log(e))
+            }
+
+            if(signal.ice){
+                connections[fromId].addIceCandidate(new RTCIceCandidate(signal.ice)).catch(e => console.log(e); 
+            }
+        }
     } 
 
     const connectToSocketServer = () => {
         socketRef.current = io(url, { secure: false });
-        socketRef.current.on('signal', getMessageFronServer);
+        socketRef.current.on('signal', gotMessageFronServer);
         socketRef.current.on("connect", () => {
             socketRef.current.emit("join-call", window.location.href);
             socketIdRef.current = socketRef.current.id;
@@ -184,6 +259,9 @@ export default function VideoMeetComponent() {
                     }else{
                         //TODO
                         //blackscreen
+                        const blackSilence = (...args) => new MediaSTream([black(...args), silence()] );
+                        window.localStream  = blackSilence();
+                        connections[socketListId].addStream(window.localStream);
                     }
 
 
