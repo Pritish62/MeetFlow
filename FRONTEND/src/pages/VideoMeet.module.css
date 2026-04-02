@@ -85,12 +85,39 @@
   color: var(--vm-accent);
 }
 
-.videoGrid {
-  max-width: 1200px;
+.controlBtnActive {
+  border-color: var(--vm-accent);
+  color: #ffffff;
+  background: var(--vm-accent);
+}
+
+.meetingLayout {
+  max-width: 1240px;
   margin: 0 auto;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.meetingMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.chatOpen .meetingMain {
+  flex: 0 1 68%;
+}
+
+.videoGrid {
+  max-width: 100%;
+  margin: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 14px;
+}
+
+.videoGridWithChat {
+  grid-template-columns: 1fr;
 }
 
 .videoCard {
@@ -122,6 +149,119 @@
   display: block;
 }
 
+.chatPanel {
+  width: min(360px, 32vw);
+  min-width: 290px;
+  background: #ffffff;
+  border: 1px solid var(--vm-border);
+  border-radius: 14px;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.09);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 180px);
+  position: sticky;
+  top: 90px;
+}
+
+.chatHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--vm-border);
+  background: linear-gradient(90deg, #eff6ff, #f0f9ff);
+}
+
+.chatTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.chatStatus {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f766e;
+  background: #ccfbf1;
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+
+.chatMessages {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.chatBubble {
+  background: #f8fafc;
+  border: 1px solid var(--vm-border);
+  border-radius: 12px;
+  padding: 10px;
+  max-width: 90%;
+}
+
+.chatBubbleSelf {
+  margin-left: auto;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.chatSender {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.chatText {
+  margin: 0;
+  font-size: 13px;
+  color: #1f2937;
+  line-height: 1.4;
+}
+
+.chatInputArea {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  border-top: 1px solid var(--vm-border);
+  padding: 12px;
+}
+
+.chatInput {
+  border: 1px solid var(--vm-border);
+  border-radius: 10px;
+  padding: 10px;
+  outline: none;
+  font-size: 14px;
+  color: var(--vm-text);
+}
+
+.chatInput:focus {
+  border-color: var(--vm-accent);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.chatSendBtn {
+  border: 1px solid var(--vm-accent);
+  background: var(--vm-accent);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.chatSendBtn:hover {
+  background: #1d4ed8;
+}
+
 @media (max-width: 900px) {
   .page {
     padding: 20px 4vw 28px;
@@ -138,6 +278,22 @@
 
   .controlsRow {
     justify-content: flex-start;
+  }
+
+  .meetingLayout {
+    flex-direction: column;
+  }
+
+  .chatOpen .meetingMain {
+    flex: 1;
+    width: 100%;
+  }
+
+  .chatPanel {
+    width: 100%;
+    min-width: 0;
+    max-height: 380px;
+    position: static;
   }
 }
 

@@ -40,6 +40,8 @@ export default function VideoMeetComponent() {
 
     let [newMessages, serNewMessages] = useState(0);
 
+    let [showChat, setShowChat] = useState(false);
+
     let [askForUsername, setAskForUsername] = useState(true);
 
     let [username, setUsername] = useState("");
@@ -316,8 +318,47 @@ export default function VideoMeetComponent() {
     const handelAudio = () => {
         setAudio(!audio);
     }
-    const getDisplayMediaSuccess  =( ) => {
-        
+
+    const getDisplayMediaSuccess  =(stream ) => {
+        try {
+            window.localStream.getTracks().forEach(track => track.stop());
+        } catch (error) {
+            console.log(error);
+        }
+
+        window.localStream = stream;
+        localVideoRef.current.srcObject = stream;
+
+        for(let id in connections) {
+            if(id === socketIdRef.current) continue;
+
+            connections[id].addStream(window.localStream);
+            connections[id].createOffer().then((description) => [
+                connections[id].setLocalDescription(description)
+                .then(() => {
+                    socketRef.current.emit("signal", id, JSON.stringify({"sdp": connections[id].localDescription}))
+                }) 
+                .catch((err) => console.log(err)) 
+            ])
+        }
+
+        stream.getTracks().forEach(track => track.onended = () => {
+            setScreen(false)
+
+            try {
+                const tracks = window.localStream ? window.localStream.getTracks() : [];
+                tracks.forEach(tracks => tracks.stop())
+            } catch (err) {
+                console.log(err)
+            }
+
+            const blackSilence = (...args) => new MediaStream([black(...args), silence()]);
+            window.localStream = blackSilence();
+            localVideoRef.current.srcObject = window.localStream;
+
+            getUserMedia();
+
+        });
     } 
     const getDisplayMedia = () => {
         if (screen) {
@@ -344,6 +385,12 @@ export default function VideoMeetComponent() {
         if (!id) return "Guest";
         return id.length > 16 ? `${id.slice(0, 16)}...` : id;
     };
+
+    const chatPreview = messages.length > 0 ? messages : [
+        { from: "System", text: "Welcome to the room chat." },
+        { from: "Host", text: "Drop your quick updates here while speaking." },
+        { from: "You", text: "This is the chat UI preview." }
+    ];
 
     return (
         <div className={styles.page}>
@@ -378,30 +425,71 @@ export default function VideoMeetComponent() {
                                 <button className={styles.controlBtn} type="button" onClick={handelVideo}>{video ? "Turn Video Off" : "Turn Video On"}</button>
                                 <button className={styles.controlBtn} type="button" onClick={handelAudio}>{audio ? "Mute" : "Unmute"}</button>
                                 <button className={styles.controlBtn} type="button" onClick={handelScreen}>{screen ? "Stop Share" : "Share Screen"}</button>
+                                <button
+                                    className={`${styles.controlBtn} ${showChat ? styles.controlBtnActive : ""}`}
+                                    type="button"
+                                    onClick={() => setShowChat(!showChat)}>
+                                    {showChat ? "Close Chat" : "Open Chat"}
+                                </button>
                             </div>
                         </div>
 
-                        <div className={styles.videoGrid}>
-                            <div className={styles.videoCard}>
-                                <h2 className={styles.videoLabel}>{username || "You"}</h2>
-                                <video className={styles.videoFrame} ref={localVideoRef} autoPlay muted playsInline></video>
+                        <div className={`${styles.meetingLayout} ${showChat ? styles.chatOpen : ""}`}>
+                            <div className={styles.meetingMain}>
+                                <div className={`${styles.videoGrid} ${showChat ? styles.videoGridWithChat : ""}`}>
+                                    <div className={styles.videoCard}>
+                                        <h2 className={styles.videoLabel}>{username || "You"}</h2>
+                                        <video className={styles.videoFrame} ref={localVideoRef} autoPlay muted playsInline></video>
+                                    </div>
+
+                                    {videos.map((videoItem) => (
+                                        <div className={styles.videoCard} key={videoItem.socketId}>
+                                            <h2 className={styles.videoLabel}>{shortLabel(videoItem.socketId)}</h2>
+                                            <video
+                                                className={styles.videoFrame}
+                                                autoPlay
+                                                playsInline
+                                                data-socket={videoItem.socketId}
+                                                ref={ref => {
+                                                    if (ref && videoItem.stream) {
+                                                        ref.srcObject = videoItem.stream;
+                                                    }
+                                                }}></video>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
 
-                            {videos.map((videoItem) => (
-                                <div className={styles.videoCard} key={videoItem.socketId}>
-                                    <h2 className={styles.videoLabel}>{shortLabel(videoItem.socketId)}</h2>
-                                    <video
-                                        className={styles.videoFrame}
-                                        autoPlay
-                                        playsInline
-                                        data-socket={videoItem.socketId}
-                                        ref={ref => {
-                                            if (ref && videoItem.stream) {
-                                                ref.srcObject = videoItem.stream;
-                                            }
-                                        }}></video>
-                                </div>
-                            ))}
+                            {showChat && (
+                                <aside className={styles.chatPanel}>
+                                    <div className={styles.chatHead}>
+                                        <h4 className={styles.chatTitle}>Room Chat</h4>
+                                        <span className={styles.chatStatus}>UI Preview</span>
+                                    </div>
+
+                                    <div className={styles.chatMessages}>
+                                        {chatPreview.map((item, index) => (
+                                            <div
+                                                key={`${item.from}-${index}`}
+                                                className={`${styles.chatBubble} ${item.from === "You" ? styles.chatBubbleSelf : ""}`}>
+                                                <p className={styles.chatSender}>{item.from}</p>
+                                                <p className={styles.chatText}>{item.text}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className={styles.chatInputArea}>
+                                        <input
+                                            className={styles.chatInput}
+                                            type="text"
+                                            placeholder="Type a message"
+                                            value={message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                        />
+                                        <button className={styles.chatSendBtn} type="button">Send</button>
+                                    </div>
+                                </aside>
+                            )}
                         </div>
 
                     </>
