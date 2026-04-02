@@ -1,16 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-import { io, Socket } from "socket.io-client";
-import {
-    TextField,
-    Button,
-    Container,
-    Typography,
-    Box,
-    Link,
-    CssBaseline,
-    Avatar,
-    Grid,
-} from '@mui/material';
+import { io } from "socket.io-client";
+import { TextField } from '@mui/material';
+import styles from "./VideoMeet.module.css";
 
 const url = "http://localhost:8000";
 
@@ -33,9 +24,9 @@ export default function VideoMeetComponent() {
 
     let [audioAvailable, setAudioAvailable] = useState(true);
 
-    let [video, setVideo] = useState(false);
+    let [video, setVideo] = useState(undefined);
 
-    let [audio, setAudio] = useState(false);
+    let [audio, setAudio] = useState(undefined);
 
     let [screen, setScreen] = useState();
 
@@ -68,19 +59,21 @@ export default function VideoMeetComponent() {
     const getPermission = async () => {
         try {
             const videoPermission = await navigator.mediaDevices.getUserMedia({ video: true });
+            const hasVideoPermission = !!videoPermission;
             if (videoPermission) {
                 setVideoAvailable(true);
             } else {
                 setVideoAvailable(false)
             }
             const audioPermission = await navigator.mediaDevices.getUserMedia({ audio: true });
+            const hasAudioPermission = !!audioPermission;
             if (audioPermission) {
                 setAudioAvailable(true);
             } else {
                 setAudioAvailable(false);
             }
-            if (videoAvailable || audioAvailable) {
-                const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: videoAvailable, audio: audioAvailable });
+            if (hasVideoPermission || hasAudioPermission) {
+                const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: hasVideoPermission, audio: hasAudioPermission });
                 if (userMediaStream) {
                     window.localStream = userMediaStream;
                     if (localVideoRef.current) {
@@ -98,12 +91,19 @@ export default function VideoMeetComponent() {
 
 
     const getUserMediasuccess = (stream) => {
+        const previousStream = window.localStream;
 
         try {
-            window.localStream.getTracks().forEach(track => track.stop());
+            const previousTracks = previousStream?.getTracks?.() || [];
+            previousTracks.forEach(track => track.stop());
 
         } catch (er) {
             console.log(er);
+        }
+
+        window.localStream = stream;
+        if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
         }
 
         for (let id in connections) {
@@ -122,7 +122,7 @@ export default function VideoMeetComponent() {
             setAudio(false);
 
             try {
-                const tracks = localVideoRef.current.srcObject.getTracks();
+                const tracks = window.localStream ? window.localStream.getTracks() : [];
                 tracks.forEach(tracks => tracks.stop())
             } catch (err) {
                 console.log(err)
@@ -164,18 +164,22 @@ export default function VideoMeetComponent() {
                 .catch((e) => console.log(e));
         } else {
             try {
-                let tracks = localVideoRef.current.srcObject.getTracks();
+                let tracks = window.localStream ? window.localStream.getTracks() : [];
                 tracks.forEach(track => track.stop());
+                window.localStream = null;
+                if (localVideoRef.current) {
+                    localVideoRef.current.srcObject = null;
+                }
             } catch (error) {
                 console.log(error);
             }
         }
     }
     useEffect(() => {
-        if (video !== undefined && audio !== undefined) {
+        if (!askForUsername && video !== undefined && audio !== undefined) {
             getUserMedia();
         }
-    }, [audio, video]);
+    }, [audio, video, askForUsername]);
 
     //TODO addMessage
     const addMessage = () => {
@@ -294,14 +298,6 @@ export default function VideoMeetComponent() {
     };
 
 
-    const bindRemoteStream = (element, stream) => {
-        if (!element || !stream) return;
-        if (element.srcObject !== stream) {
-            element.srcObject = stream;
-        }
-    };
-
-
     let getMedia = () => {
         setVideo(videoAvailable);
         setAudio(audioAvailable);
@@ -343,40 +339,71 @@ export default function VideoMeetComponent() {
     const handelScreen = () => {
         setScreen(!screen);
     }
+
+    const shortLabel = (id) => {
+        if (!id) return "Guest";
+        return id.length > 16 ? `${id.slice(0, 16)}...` : id;
+    };
+
     return (
-        <div>
+        <div className={styles.page}>
             {
                 askForUsername === true ?
-                    <div>
-                        <h3> Enter to Lobby</h3>
-                        <TextField id="outlined-basic" label="username" variant="outlined" value={username} onChange={e => setUsername(e.target.value)} />
-                        <Button variant="contained" onClick={connect}>connect</Button>
-                        <div>
-                            <video ref={localVideoRef} autoPlay muted></video>
+                    <div className={styles.lobbyCard}>
+                        <h3 className={styles.title}>Enter to Lobby</h3>
+                        <p className={styles.subtitle}>Enter your name, preview your camera, then connect.</p>
+
+                        <div className={styles.formRow}>
+                            <TextField
+                                id="outlined-basic"
+                                label="Username"
+                                variant="outlined"
+                                value={username}
+                                onChange={e => setUsername(e.target.value)}
+                                fullWidth
+                            />
+                            <button className={styles.controlBtn} type="button" onClick={connect}>Connect</button>
+                        </div>
+
+                        <div className={styles.previewPanel}>
+                            <video className={styles.videoFrame} ref={localVideoRef} autoPlay muted playsInline></video>
                         </div>
                     </div> : <>
+                        <div className={styles.meetTopBar}>
+                            <div>
+                                <h3 className={styles.title}>Meeting Room</h3>
+                                <p className={styles.subtitle}>Connected as {username || "Guest"}</p>
+                            </div>
+                            <div className={styles.controlsRow}>
+                                <button className={styles.controlBtn} type="button" onClick={handelVideo}>{video ? "Turn Video Off" : "Turn Video On"}</button>
+                                <button className={styles.controlBtn} type="button" onClick={handelAudio}>{audio ? "Mute" : "Unmute"}</button>
+                                <button className={styles.controlBtn} type="button" onClick={handelScreen}>{screen ? "Stop Share" : "Share Screen"}</button>
+                            </div>
+                        </div>
 
-                        <video ref={localVideoRef} autoPlay muted></video>
-                        {videos.map((videoItem) => (
-
-                            <div key={videoItem.socketId}>
-                                <h2>{videoItem.socketId}</h2>
-                                <video
-                                    autoPlay
-                                    playsInline
-
-                                    data-socket={videoItem.socketId}
-
-                                    ref={ref => {
-                                        if (ref && videoItem.stream) {
-                                            ref.srcObject = videoItem.stream;
-                                        }
-                                    }}></video>
+                        <div className={styles.videoGrid}>
+                            <div className={styles.videoCard}>
+                                <h2 className={styles.videoLabel}>{username || "You"}</h2>
+                                <video className={styles.videoFrame} ref={localVideoRef} autoPlay muted playsInline></video>
                             </div>
 
+                            {videos.map((videoItem) => (
+                                <div className={styles.videoCard} key={videoItem.socketId}>
+                                    <h2 className={styles.videoLabel}>{shortLabel(videoItem.socketId)}</h2>
+                                    <video
+                                        className={styles.videoFrame}
+                                        autoPlay
+                                        playsInline
+                                        data-socket={videoItem.socketId}
+                                        ref={ref => {
+                                            if (ref && videoItem.stream) {
+                                                ref.srcObject = videoItem.stream;
+                                            }
+                                        }}></video>
+                                </div>
+                            ))}
+                        </div>
 
-
-                        ))}
                     </>
             }
         </div>
