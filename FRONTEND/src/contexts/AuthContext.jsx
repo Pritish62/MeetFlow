@@ -21,7 +21,14 @@ const client = axios.create({
 });
 
 export const AuthProvider = ({ children }) => {
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState(() => {
+        try {
+            const storedUser = localStorage.getItem("authUser");
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch (error) {
+            return null;
+        }
+    });
     const [token, setToken] = useState(localStorage.getItem("token") || null);
 
     useEffect(() => {
@@ -31,6 +38,14 @@ export const AuthProvider = ({ children }) => {
             localStorage.removeItem("token");
         }
     }, [token]);
+
+    useEffect(() => {
+        if (userData) {
+            localStorage.setItem("authUser", JSON.stringify(userData));
+        } else {
+            localStorage.removeItem("authUser");
+        }
+    }, [userData]);
 
     const handleRegister = async (username, email, password) => {
         try {
@@ -54,6 +69,10 @@ export const AuthProvider = ({ children }) => {
             if (request.status === 200 && request.data.token) {
                 localStorage.setItem("token", request.data.token);
                 setToken(request.data.token);
+                setUserData({
+                    username: request.data.username,
+                    email: request.data.email
+                });
                 return request.data;
             }
             throw new Error(request.data.message || "Failed to login");
@@ -64,6 +83,7 @@ export const AuthProvider = ({ children }) => {
 
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("authUser");
         setToken(null);
         setUserData(null);
     };

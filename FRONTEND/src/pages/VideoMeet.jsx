@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import { io } from "socket.io-client";
 import { TextField } from '@mui/material';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import styles from "./VideoMeet.module.css";
 
 const url = "http://localhost:8000";
@@ -14,7 +14,24 @@ const peerConnections = {
     ]
 }
 
+const getStoredAuthUsername = () => {
+    const token = localStorage.getItem("token");
+    if (!token) return "";
+
+    try {
+        const storedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
+        return typeof storedUser.username === "string" ? storedUser.username : "";
+    } catch (error) {
+        return "";
+    }
+};
+
 export default function VideoMeetComponent() {
+
+    const { url: meetingCode = "" } = useParams();
+    const meetingLink = `${window.location.origin}/${meetingCode}`;
+    const [storedAuthUsername] = useState(() => getStoredAuthUsername());
+    const autoConnectRef = useRef(false);
 
     var socketRef = useRef();
     let socketIdRef = useRef();
@@ -43,9 +60,13 @@ export default function VideoMeetComponent() {
 
     let [showChat, setShowChat] = useState(false);
 
-    let [askForUsername, setAskForUsername] = useState(true);
+    let [askForUsername, setAskForUsername] = useState(() => !storedAuthUsername);
 
-    let [username, setUsername] = useState("");
+    let [username, setUsername] = useState(() => storedAuthUsername || "");
+
+    let [meetingActionStatus, setMeetingActionStatus] = useState("");
+
+    let [permissionsReady, setPermissionsReady] = useState(false);
 
     const videoRef = useRef([]);
 
@@ -88,6 +109,8 @@ export default function VideoMeetComponent() {
             }
         } catch (err) {
             console.log(err);
+        } finally {
+            setPermissionsReady(true);
         }
     }
     useEffect(() => {
@@ -318,6 +341,16 @@ export default function VideoMeetComponent() {
         connectToSocketServer();
     };
 
+    useEffect(() => {
+        if (!permissionsReady || !storedAuthUsername || autoConnectRef.current) {
+            return;
+        }
+
+        autoConnectRef.current = true;
+        setAskForUsername(false);
+        getMedia();
+    }, [permissionsReady, storedAuthUsername]);
+
     const connect = () => {
         if (!username.trim()) return;
         getMedia();
@@ -421,17 +454,61 @@ export default function VideoMeetComponent() {
         return id.length > 16 ? `${id.slice(0, 16)}...` : id;
     };
 
+    const copyText = async (textToCopy) => {
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const handleCopyMeetingCode = async () => {
+        if (!meetingCode) return;
+        const copied = await copyText(meetingCode);
+        setMeetingActionStatus(copied ? "Meeting code copied." : "Could not copy meeting code.");
+    };
+
+    const handleShareMeeting = async () => {
+        const shareData = {
+            title: "Meeting Invite",
+            text: `Join my meeting. Code: ${meetingCode}`,
+            url: meetingLink
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+                setMeetingActionStatus("Meeting link shared.");
+                return;
+            } catch (error) {
+                if (error?.name === "AbortError") {
+                    return;
+                }
+            }
+        }
+
+        const copied = await copyText(`${shareData.text}\n${shareData.url}`);
+        setMeetingActionStatus(copied ? "Share text copied." : "Could not share meeting link.");
+    };
+
+    useEffect(() => {
+        if (!meetingActionStatus) return;
+
+        const timer = setTimeout(() => {
+            setMeetingActionStatus("");
+        }, 2200);
+
+        return () => clearTimeout(timer);
+    }, [meetingActionStatus]);
+
     const chatPreview = messages.length > 0 ? messages : [
         { sender: "Host", data: "Drop your quick updates here while speaking." },
         { sender: "You", data: "This is the chat UI preview." }
     ];
 
-    const handelChat = () => {
-        socketRef.current.emit('chat-message', message, username);
-        setMessage("");
-    }
-
     const sendMessage = () => {
+        if (!message.trim() || !socketRef.current) return;
         socketRef.current.emit("chat-message", message, username);
         setMessage("")
     }
@@ -460,9 +537,19 @@ export default function VideoMeetComponent() {
                         </div>
                     </div> : <>
                         <div className={styles.meetTopBar}>
-                            <div>
+                            <div className={styles.meetTopMeta}>
                                 <h3 className={styles.title}>Meeting Room</h3>
                                 <p className={styles.subtitle}>Connected as {username || "Guest"}</p>
+
+                                <div className={styles.meetingCodeCard}>
+                                    <p className={styles.meetingCodeLabel}>Meeting code</p>
+                                    <p className={styles.meetingCodeValue}>{meetingCode || "Unavailable"}</p>
+                                    <div className={styles.meetingCodeActions}>
+                                        <button className={styles.controlBtn} type="button" onClick={handleShareMeeting}>Share</button>
+                                        <button className={styles.controlBtn} type="button" onClick={handleCopyMeetingCode}>Copy Code</button>
+                                    </div>
+                                    {meetingActionStatus && <p className={styles.meetingActionStatus}>{meetingActionStatus}</p>}
+                                </div>
                             </div>
                             <div className={styles.controlsRow}>
                                 <button className={styles.controlBtn} type="button" onClick={handelVideo}>{video ? "Turn Video Off" : "Turn Video On"}</button>
