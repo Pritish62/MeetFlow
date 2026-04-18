@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   TextField,
   Button,
@@ -20,7 +20,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const location = useLocation();
 
-  const { handleLogin } = React.useContext(AuthContext);
+  const { handleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
   const [error, setError] = useState('');
 
@@ -34,6 +34,11 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+
+    if (typeof handleLogin !== 'function') {
+      setError("Auth service is unavailable. Please refresh and try again.");
+      return;
+    }
 
     try {
       await handleLogin(email, password);

@@ -1,8 +1,27 @@
-import { NavLink } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import logo from '../assets/images/logo.png';
+import { AuthContext } from "../contexts/AuthContext.jsx";
 
 const Navbar = () => {
+  const { token, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const isLoggedIn = Boolean(token);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    setIsMenuOpen(false);
+    navigate("/login", { replace: true });
+  };
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setIsMenuOpen(false);
+    }
+  }, [isLoggedIn]);
+
   return (
     <div className={styles.Navcontainer}>
       <nav className={styles.navbar}>
@@ -11,19 +30,50 @@ const Navbar = () => {
           <h2>MeetFlow</h2>
         </div>
 
-        <div className={styles.navLinks}>
-          <a href="#why" className={styles.btn}>Why MeetFlow?</a>
-          <a href="#features" className={styles.btn}>Features</a>
-          <a href="#platforms" className={styles.btn}>Platforms</a>
-      
-        </div>
+        {!isLoggedIn && (
+          <>
+            <div className={styles.navLinks}>
+              <a href="#why" className={styles.btn}>Why MeetFlow?</a>
+              <a href="#features" className={styles.btn}>Features</a>
+              <a href="#platforms" className={styles.btn}>Platforms</a>
+            </div>
 
-        <div className={styles.authLinks}>
-          <NavLink to="/guest" className={`${styles.btnPrimary} ${styles.joinBtn}`}>Join as geust</NavLink>
-          <NavLink to="/Login" className={styles.btn}>Login</NavLink>
-          <NavLink to="/Register" className={styles.btnPrimary}>Sign Up</NavLink>
+            <div className={styles.authLinks}>
+              <NavLink to="/guest" className={`${styles.btnPrimary} ${styles.joinBtn}`}>Join as Guest</NavLink>
+              <NavLink to="/login" className={styles.btn}>Login</NavLink>
+              <NavLink to="/register" className={styles.btnPrimary}>Sign Up</NavLink>
+            </div>
+          </>
+        )}
 
-        </div>
+        {isLoggedIn && (
+          <div className={styles.loggedInActions}>
+            <button
+              type="button"
+              className={styles.burgerButton}
+              aria-label="Open account menu"
+              aria-expanded={isMenuOpen}
+              onClick={() => setIsMenuOpen((prev) => !prev)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+
+            {isMenuOpen && (
+              <div className={styles.menuDropdown}>
+                <button type="button" className={styles.dropdownItem}>Call History</button>
+                <button
+                  type="button"
+                  className={`${styles.dropdownItem} ${styles.dangerItem}`}
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </nav>
     </div>
   );

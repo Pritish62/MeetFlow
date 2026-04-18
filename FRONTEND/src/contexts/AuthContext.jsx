@@ -1,7 +1,20 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
-export const AuthContext = createContext({});
+const defaultAuthContextValue = {
+    userData: null,
+    setUserData: () => { },
+    token: null,
+    handleRegister: async () => {
+        throw new Error("AuthProvider is not available");
+    },
+    handleLogin: async () => {
+        throw new Error("AuthProvider is not available");
+    },
+    logout: () => { }
+};
+
+export const AuthContext = createContext(defaultAuthContextValue);
 
 const client = axios.create({
     baseURL: "http://localhost:8000/users"
@@ -39,6 +52,7 @@ export const AuthProvider = ({ children }) => {
                 password
             });
             if (request.status === 200 && request.data.token) {
+                localStorage.setItem("token", request.data.token);
                 setToken(request.data.token);
                 return request.data;
             }
@@ -49,6 +63,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = () => {
+        localStorage.removeItem("token");
         setToken(null);
         setUserData(null);
     };
