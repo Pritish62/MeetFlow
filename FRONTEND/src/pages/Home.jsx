@@ -51,7 +51,6 @@ const Home = () => {
                         <button type="submit" className={styles.joinButton}>
                             Join Meeting
                         </button>
-
                         <button
                             type="button"
                             className={styles.createButton}

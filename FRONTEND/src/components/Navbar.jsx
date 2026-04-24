@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import logo from '../assets/images/logo.png';
-import { AuthContext } from "../contexts/AuthContext.jsx";
+import AuthContext from "../contexts/AuthContext.jsx";
 
 const Navbar = () => {
   const { token, logout } = useContext(AuthContext);
@@ -14,6 +14,11 @@ const Navbar = () => {
     logout();
     setIsMenuOpen(false);
     navigate("/login", { replace: true });
+  };
+
+  const handleOpenHistory = () => {
+    setIsMenuOpen(false);
+    navigate("/history");
   };
 
   useEffect(() => {
@@ -62,7 +67,7 @@ const Navbar = () => {
 
             {isMenuOpen && (
               <div className={styles.menuDropdown}>
-                <button type="button" className={styles.dropdownItem}>Call History</button>
+                <button type="button" className={styles.dropdownItem} onClick={handleOpenHistory}>Call History</button>
                 <button
                   type="button"
                   className={`${styles.dropdownItem} ${styles.dangerItem}`}

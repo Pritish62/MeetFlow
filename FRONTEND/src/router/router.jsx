@@ -5,6 +5,7 @@ import Login from "../pages/Login.jsx";
 import Register from "../pages/Register.jsx";
 import Landingpage from "../pages/Landingpage.jsx";
 import VideoMeetComponent from "../pages/VideoMeet.jsx";
+import History from "../pages/history.jsx";
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
             {
                 path: "/:url",
                 element: <VideoMeetComponent/>
+            },
+            {
+                path: "history",
+                element: <History/>
             }
         ]
     }

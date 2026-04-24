@@ -15,6 +15,7 @@ const defaultAuthContextValue = {
 };
 
 export const AuthContext = createContext(defaultAuthContextValue);
+export default AuthContext;
 
 const client = axios.create({
     baseURL: "http://localhost:8000/users"
@@ -80,7 +81,28 @@ export const AuthProvider = ({ children }) => {
             throw err;
         }
     };
+const getToHistoryOfUser = async () => {
+    try {
+        let request = await client.get("/get_all_activity", {
+            params: {
+                token: localStorage.getItem("token")
+            }
+        });
+        return request.data
+    } catch (err ) {
+        throw err
+    }
+}
 
+const addToUserHistory = async (meetingCode) => {
+    try {
+        const request = await client.post("/add_to_activity");
+        token: localStorage.getItem("token");
+        meeting_code: meetingCode
+    } catch (error) {
+        
+    }
+}
     const logout = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("authUser");
@@ -91,6 +113,8 @@ export const AuthProvider = ({ children }) => {
     const data = {
         userData,
         setUserData,
+        addToUserHistory,
+        getToHistoryOfUser,
         token,
         handleRegister,
         handleLogin,
