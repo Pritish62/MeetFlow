@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import logo from '../assets/images/logo.png';
 import AuthContext from "../contexts/AuthContext.jsx";
 
 const Navbar = () => {
   const { token, logout } = useContext(AuthContext);
+  const location = useLocation();
   const navigate = useNavigate();
   const isLoggedIn = Boolean(token);
+  const isLandingPage = location.pathname === "/";
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -28,7 +30,7 @@ const Navbar = () => {
   }, [isLoggedIn]);
 
   return (
-    <div className={styles.Navcontainer}>
+    <div className={`${styles.Navcontainer} ${isLandingPage ? styles.NavcontainerLanding : styles.NavcontainerDefault}`}>
       <nav className={styles.navbar}>
         <div className={styles.logo}>
           <span className={styles.logoIcon}><img src={logo} alt="MeetFlow logo" /></span>
