@@ -54,29 +54,7 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         {!isLoggedIn && (
           <>
-            <div className="hidden md:flex gap-8 items-center">
-              <a href="#why" className={`text-sm font-semibold transition-colors ${
-                isLandingPage 
-                  ? "text-white hover:text-cyan-300" 
-                  : "text-slate-900 hover:text-blue-600"
-              }`}>
-                Why MeetFlow?
-              </a>
-              <a href="#features" className={`text-sm font-semibold transition-colors ${
-                isLandingPage 
-                  ? "text-white hover:text-cyan-300" 
-                  : "text-slate-900 hover:text-blue-600"
-              }`}>
-                Features
-              </a>
-              <a href="#platforms" className={`text-sm font-semibold transition-colors ${
-                isLandingPage 
-                  ? "text-white hover:text-cyan-300" 
-                  : "text-slate-900 hover:text-blue-600"
-              }`}>
-                Platforms
-              </a>
-            </div>
+           
 
             <div className="hidden md:flex gap-3 items-center">
               <NavLink 

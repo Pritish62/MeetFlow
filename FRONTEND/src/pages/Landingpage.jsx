@@ -1,86 +1,115 @@
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+"use client";
+import Hero from '../assets/images/hero.svg';
+
+import { motion } from "motion/react";
 
 const Landingpage = () => {
   const { token } = useContext(AuthContext);
   const isLoggedIn = Boolean(token);
 
   return (
-    <main className="min-h-[calc(100vh-84px)] px-6 py-11 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Background decorative elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400 rounded-full opacity-10 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
-
-      <section id="why" className="relative w-full max-w-4xl mx-auto rounded-2xl border border-slate-600 bg-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-2 items-center gap-6 p-8">
-        <div className="pr-0 lg:pr-4">
-          <h1 className="m-0 text-5xl lg:text-6xl font-black leading-tight text-white">
-            Connect with your loved one
-          </h1>
-          <p className="mt-4 mb-0 max-w-md text-lg leading-relaxed text-slate-300">
-            Simple, private, and reliable video calls for every moment that matters.
-          </p>
-
-          <NavLink 
-            to={isLoggedIn ? "/home" : "/register"} 
-            className="inline-flex items-center justify-center mt-8 h-12 px-8 rounded-xl text-base font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-cyan-500/40 hover:-translate-y-1 active:translate-y-0 transition-all no-underline"
-          >
-            {isLoggedIn ? "✨ Join Meeting" : "🚀 Get Started"}
-          </NavLink>
-        </div>
-
-        {/* Hero SVG */}
-        <div className="hidden lg:flex justify-center items-center">
-          <svg
-            className="w-full h-auto"
-            viewBox="0 0 520 420"
-            role="img"
-            aria-label="Two people connected on a video call"
-          >
-            <defs>
-              <linearGradient id="bgCard" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#1f2937" />
-                <stop offset="100%" stopColor="#111827" />
-              </linearGradient>
-              <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#38bdf8" />
-                <stop offset="100%" stopColor="#3b82f6" />
-              </linearGradient>
-            </defs>
-
-            <circle cx="90" cy="70" r="42" fill="rgba(56,189,248,0.18)" />
-            <circle cx="430" cy="340" r="56" fill="rgba(59,130,246,0.16)" />
-
-            <rect x="70" y="80" width="380" height="260" rx="24" fill="url(#bgCard)" stroke="#334155" strokeWidth="2" />
-
-            <rect x="95" y="110" width="150" height="190" rx="16" fill="#0f172a" stroke="#334155" />
-            <rect x="275" y="110" width="150" height="190" rx="16" fill="#0f172a" stroke="#334155" />
-
-            <circle cx="170" cy="166" r="32" fill="url(#accent)" />
-            <rect x="128" y="206" width="84" height="62" rx="30" fill="#1e40af" />
-
-            <circle cx="350" cy="166" r="32" fill="#60a5fa" />
-            <rect x="308" y="206" width="84" height="62" rx="30" fill="#1d4ed8" />
-
-            <rect x="220" y="318" width="80" height="8" rx="4" fill="#38bdf8" />
-          </svg>
-        </div>
-      </section>
-
-      {/* Feature sections */}
-      <section id="features" className="relative w-full max-w-4xl mx-auto mt-4 rounded-xl border border-slate-600 bg-slate-800/50 px-6 py-4">
-        <p className="m-0 text-slate-300 text-sm">
-          ⚡ Built for fast and simple meetings.
-        </p>
-      </section>
-
-      <section id="platforms" className="relative w-full max-w-4xl mx-auto mt-4 rounded-xl border border-slate-600 bg-slate-800/50 px-6 py-4">
-        <p className="m-0 text-slate-300 text-sm">
-          🌐 Works smoothly on desktop and mobile browsers.
-        </p>
-      </section>
-    </main>
+    <>
+    <div 
+    
+      className="relative min-h-screen  flex-col items-center justify-center bg-black">
+      <div
+        className="absolute inset-y-0 left-0 h-full w-px bg-neutral-200/80 dark:bg-neutral-800/80">
+        <div
+          className="absolute top-0 h-40 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
+      </div>
+      <div
+        className="absolute inset-y-0 right-0 h-full w-px bg-neutral-200/80 dark:bg-neutral-800/80">
+        <div
+          className="absolute h-40 w-px bg-gradient-to-b from-transparent via-blue-500 to-transparent" />
+      </div>
+      <div
+        className="absolute inset-x-0 bottom-0 h-px w-full bg-neutral-200/80 dark:bg-neutral-800/80">
+        <div
+          className="absolute mx-auto h-px w-40 bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+      </div>
+      <div className="px-4 py-10 md:py-20 ">
+        <h1
+          className="relative z-10 mx-auto max-w-4xl text-center text-2xl font-bold text-slate-700 md:text-4xl lg:text-5xl dark:text-slate-300">
+          {"Meet, Connect Instantly On Live Video Call & Chat"
+            .split("  ")
+            .map((word, index) => (
+              <motion.span
+                key={index}
+                initial={{ opacity: 0, filter: "blur(4px)", y: 10 }}
+                animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.1,
+                  ease: "easeInOut",
+                }}
+                className="mr-2 inline-block">
+                {word}
+              </motion.span>
+            ))}
+        </h1>
+      
+        <motion.p
+          initial={{
+            opacity: 0,
+          }}
+          animate={{
+            opacity: 1,
+          }}
+          transition={{
+            duration: 0.3,
+            delay: 0.8,
+          }}
+          className="relative z-10 mx-auto max-w-xl py-4 text-center text-lg font-normal text-neutral-600 dark:text-neutral-400">
+          Connect, collabrate and get more done together video call meeting with MeetFlow 
+          
+        </motion.p>
+        <motion.div
+          initial={{
+            opacity: 0,
+          }}
+          animate={{
+            opacity: 1,
+          }}
+          transition={{
+            duration: 0.3,
+            delay: 1,
+          }}
+          className="relative z-10 mt-8 flex flex-wrap items-center justify-center gap-4">
+          <button
+            className="w-60 transform rounded-lg bg-black px-6 py-2 font-medium text-white transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+            Explore Now
+          </button>
+          <button
+            className="w-60 transform rounded-lg border border-gray-300 bg-white px-6 py-2 font-medium text-black transition-all duration-300 hover:-translate-y-0.5 hover:bg-gray-100 dark:border-gray-700 dark:bg-black dark:text-white dark:hover:bg-gray-900">
+            Create Meeting
+          </button>
+        </motion.div>
+        <motion.div
+          initial={{
+            opacity: 0,
+            y: 10,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.3,
+            delay: 1.2,
+          }}
+>        </motion.div>
+      </div>
+    </div>
+    
+    </>
+    
+    
   );
-};
+}
+
+
 
 export default Landingpage;

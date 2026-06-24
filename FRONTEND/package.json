@@ -15,13 +15,18 @@
     "@fontsource/roboto": "^5.2.10",
     "@mui/icons-material": "^7.3.8",
     "@mui/material": "^7.3.8",
+    "@tabler/icons-react": "^3.44.0",
     "@tailwindcss/vite": "^4.3.1",
     "axios": "^1.13.5",
+    "clsx": "^2.1.1",
+    "cobe": "^2.0.1",
     "http-status": "^2.1.0",
+    "motion": "^12.41.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0",
     "socket.io-client": "^4.8.3",
+    "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
