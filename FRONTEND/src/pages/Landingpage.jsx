@@ -1,30 +1,42 @@
 import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
-import styles from "./Landingpage.module.css";
 
 const Landingpage = () => {
   const { token } = useContext(AuthContext);
   const isLoggedIn = Boolean(token);
 
   return (
-    <main className={styles.pageWrap}>
-      <section id="why" className={styles.heroSection}>
-        <div className={styles.leftSide}>
-          <h1 className={styles.title}>Connect with your loved one</h1>
-          <p className={styles.slogan}>Simple, private, and reliable video calls for every moment that matters.</p>
+    <main className="min-h-[calc(100vh-84px)] px-6 py-11 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-cyan-400 rounded-full opacity-10 blur-3xl"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
 
-          <NavLink to={isLoggedIn ? "/home" : "/register"} className={styles.ctaButton}>
-            {isLoggedIn ? "Join Meeting" : "Get Started"}
+      <section id="why" className="relative w-full max-w-4xl mx-auto rounded-2xl border border-slate-600 bg-slate-800 shadow-2xl grid grid-cols-1 lg:grid-cols-2 items-center gap-6 p-8">
+        <div className="pr-0 lg:pr-4">
+          <h1 className="m-0 text-5xl lg:text-6xl font-black leading-tight text-white">
+            Connect with your loved one
+          </h1>
+          <p className="mt-4 mb-0 max-w-md text-lg leading-relaxed text-slate-300">
+            Simple, private, and reliable video calls for every moment that matters.
+          </p>
+
+          <NavLink 
+            to={isLoggedIn ? "/home" : "/register"} 
+            className="inline-flex items-center justify-center mt-8 h-12 px-8 rounded-xl text-base font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-500 hover:shadow-lg hover:shadow-cyan-500/40 hover:-translate-y-1 active:translate-y-0 transition-all no-underline"
+          >
+            {isLoggedIn ? "✨ Join Meeting" : "🚀 Get Started"}
           </NavLink>
         </div>
 
-        <div className={styles.rightSide}>
+        {/* Hero SVG */}
+        <div className="hidden lg:flex justify-center items-center">
           <svg
-            className={styles.heroSvg}
+            className="w-full h-auto"
             viewBox="0 0 520 420"
             role="img"
-            aria-label="Two people connected on a video call">
+            aria-label="Two people connected on a video call"
+          >
             <defs>
               <linearGradient id="bgCard" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#1f2937" />
@@ -55,12 +67,17 @@ const Landingpage = () => {
         </div>
       </section>
 
-      <section id="features" className={styles.anchorSection}>
-        <p>Built for fast and simple meetings.</p>
+      {/* Feature sections */}
+      <section id="features" className="relative w-full max-w-4xl mx-auto mt-4 rounded-xl border border-slate-600 bg-slate-800/50 px-6 py-4">
+        <p className="m-0 text-slate-300 text-sm">
+          ⚡ Built for fast and simple meetings.
+        </p>
       </section>
 
-      <section id="platforms" className={styles.anchorSection}>
-        <p>Works smoothly on desktop and mobile browsers.</p>
+      <section id="platforms" className="relative w-full max-w-4xl mx-auto mt-4 rounded-xl border border-slate-600 bg-slate-800/50 px-6 py-4">
+        <p className="m-0 text-slate-300 text-sm">
+          🌐 Works smoothly on desktop and mobile browsers.
+        </p>
       </section>
     </main>
   );

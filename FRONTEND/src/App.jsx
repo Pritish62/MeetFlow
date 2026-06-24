@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import './App.css'
 import router from "./router/router.jsx"
 import { RouterProvider } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext.jsx'
